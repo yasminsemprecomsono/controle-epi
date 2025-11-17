@@ -11,7 +11,7 @@ public class InfosColaboradorDTO {
     private String nome;
     private String matricula;
 
-    // Construtor que converte Entity para DTO
+    // converte entity para dto
     public InfosColaboradorDTO(ColaboradorEntity entity) {
         this.id = entity.getId();
         this.nome = entity.getNome();

@@ -20,7 +20,6 @@ public class InfosEmprestimoDTO {
     private String nomeEquipamento;
     private String numeroCAEquipamento;
 
-    // Construtor que converte Entity para DTO
     public InfosEmprestimoDTO(EmprestimoEntity entity) {
         this.idEmprestimo = entity.getId();
         this.dataEmprestimo = entity.getDataEmprestimo();

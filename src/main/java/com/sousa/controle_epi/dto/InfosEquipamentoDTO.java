@@ -11,7 +11,6 @@ public class InfosEquipamentoDTO {
     private String nomeEquipamento;
     private String numeroCA;
 
-    // Construtor que converte Entity para DTO
     public InfosEquipamentoDTO(EquipamentoEntity entity) {
         this.id = entity.getId();
         this.nomeEquipamento = entity.getNomeEquipamento();
