@@ -1,5 +1,4 @@
 package com.sousa.controle_epi.controller;
-
 import com.sousa.controle_epi.dto.InfosEmprestimoDTO;
 import com.sousa.controle_epi.dto.RequisitarEmprestimoDTO;
 import com.sousa.controle_epi.service.EmprestimoService;
@@ -7,13 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
 @RequestMapping("/emprestimos")
 public class EmprestimoController {
-
     @Autowired
     private EmprestimoService emprestimoService;
 

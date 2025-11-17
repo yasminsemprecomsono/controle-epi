@@ -1,5 +1,4 @@
 package com.sousa.controle_epi.controller;
-
 import com.sousa.controle_epi.dto.InfosEquipamentoDTO;
 import com.sousa.controle_epi.dto.RequisitarEquipamentoDTO;
 import com.sousa.controle_epi.service.EquipamentoService;
@@ -7,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController

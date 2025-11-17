@@ -1,5 +1,4 @@
 package com.sousa.controle_epi.controller;
-
 import com.sousa.controle_epi.dto.InfosColaboradorDTO;
 import com.sousa.controle_epi.dto.RequisitarColaboradorDTO;
 import com.sousa.controle_epi.service.ColaboradorService;
@@ -7,17 +6,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
 @RequestMapping("/colaboradores")
 public class ColaboradorController {
-
     @Autowired
     private ColaboradorService colaboradorService;
 
-    @PostMapping
+    @PostMapping //recebe os dados e cria
     public ResponseEntity<InfosColaboradorDTO> criarColaborador(@RequestBody RequisitarColaboradorDTO dto) {
         InfosColaboradorDTO colaborador = colaboradorService.criarColaborador(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(colaborador);
