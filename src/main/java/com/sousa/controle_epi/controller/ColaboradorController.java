@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/colaboradores") // Todos os endpoints aqui começam com /colaboradores
+@RequestMapping("/colaboradores")
 public class ColaboradorController {
 
     @Autowired
