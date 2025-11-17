@@ -18,7 +18,7 @@ public class EquipamentoService {
     @Autowired
     private EquipamentoRepository equipamentoRepository;
 
-    // CREATE
+    // create
     public InfosEquipamentoDTO criarEquipamento(RequisitarEquipamentoDTO dto) {
         EquipamentoEntity equipamento = new EquipamentoEntity();
         equipamento.setNomeEquipamento(dto.getNomeEquipamento());
@@ -28,7 +28,6 @@ public class EquipamentoService {
         return new InfosEquipamentoDTO(equipamentoSalvo);
     }
 
-    // READ (All)
     public List<InfosEquipamentoDTO> listarEquipamentos() {
         return equipamentoRepository.findAll()
                 .stream()
@@ -36,14 +35,12 @@ public class EquipamentoService {
                 .collect(Collectors.toList());
     }
 
-    // READ (One by ID)
     public InfosEquipamentoDTO buscarEquipamentoPorId(Long id) {
         EquipamentoEntity equipamento = equipamentoRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Equipamento não encontrado"));
         return new InfosEquipamentoDTO(equipamento);
     }
-
-    // UPDATE
+    // up
     public InfosEquipamentoDTO atualizarEquipamento(Long id, RequisitarEquipamentoDTO dto) {
         EquipamentoEntity equipamento = equipamentoRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Equipamento não encontrado"));
@@ -54,13 +51,11 @@ public class EquipamentoService {
         EquipamentoEntity equipamentoAtualizado = equipamentoRepository.save(equipamento);
         return new InfosEquipamentoDTO(equipamentoAtualizado);
     }
-
-    // DELETE
+//delete
     public void deletarEquipamento(Long id) {
         if (!equipamentoRepository.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Equipamento não encontrado");
         }
-        // Adicionar lógica futura: não deixar excluir equipamento com empréstimo ativo
         equipamentoRepository.deleteById(id);
     }
 }

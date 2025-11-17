@@ -18,7 +18,7 @@ public class ColaboradorService {
     @Autowired
     private ColaboradorRepository colaboradorRepository;
 
-    // CREATE
+    // create
     public InfosColaboradorDTO criarColaborador(RequisitarColaboradorDTO dto) {
         ColaboradorEntity colaborador = new ColaboradorEntity();
         colaborador.setNome(dto.getNome());
@@ -27,8 +27,6 @@ public class ColaboradorService {
         ColaboradorEntity colaboradorSalvo = colaboradorRepository.save(colaborador);
         return new InfosColaboradorDTO(colaboradorSalvo);
     }
-
-    // READ (All)
     public List<InfosColaboradorDTO> listarColaboradores() {
         return colaboradorRepository.findAll()
                 .stream()
@@ -36,14 +34,14 @@ public class ColaboradorService {
                 .collect(Collectors.toList());
     }
 
-    // READ (One by ID)
+    // read
     public InfosColaboradorDTO buscarColaboradorPorId(Long id) {
         ColaboradorEntity colaborador = colaboradorRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Colaborador não encontrado"));
         return new InfosColaboradorDTO(colaborador);
     }
 
-    // UPDATE
+    // update
     public InfosColaboradorDTO atualizarColaborador(Long id, RequisitarColaboradorDTO dto) {
         ColaboradorEntity colaborador = colaboradorRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Colaborador não encontrado"));
@@ -55,12 +53,11 @@ public class ColaboradorService {
         return new InfosColaboradorDTO(colaboradorAtualizado);
     }
 
-    // DELETE
+    // delete
     public void deletarColaborador(Long id) {
         if (!colaboradorRepository.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Colaborador não encontrado");
         }
-        // Adicionar lógica futura: não deixar excluir colaborador com empréstimo ativo
         colaboradorRepository.deleteById(id);
     }
 }
