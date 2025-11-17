@@ -17,8 +17,8 @@ public class EquipamentoEntity {
     private Long id;
 
     @Column(nullable = false)
-    private String nomeEquipamento; // Ex: "Capacete", "Luva de Raspa"
+    private String nomeEquipamento;
 
     @Column(nullable = false, unique = true)
-    private String numeroCA; // Certificado de Aprovação (identificador único do EPI)
+    private String numeroCA;
 }

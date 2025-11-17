@@ -9,9 +9,9 @@ import java.util.List;
 
 @Entity
 @Table(name = "colaboradores")
-@Data // Anotação do Lombok para getters, setters, equals, hashCode e toString
-@NoArgsConstructor // Construtor vazio
-@AllArgsConstructor // Construtor com todos os argumentos
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class ColaboradorEntity {
 
     @Id
@@ -24,7 +24,6 @@ public class ColaboradorEntity {
     @Column(nullable = false, unique = true)
     private String matricula;
 
-    // Um colaborador pode ter vários empréstimos
     @OneToMany(mappedBy = "colaborador")
     private List<EmprestimoEntity> emprestimos;
 }

@@ -18,12 +18,10 @@ public class EmprestimoEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Muitos empréstimos podem pertencer a UM colaborador
     @ManyToOne
     @JoinColumn(name = "colaborador_id", nullable = false)
     private ColaboradorEntity colaborador;
 
-    // Muitos empréstimos podem ser do MESMO equipamento (em datas diferentes)
     @ManyToOne
     @JoinColumn(name = "equipamento_id", nullable = false)
     private EquipamentoEntity equipamento;
@@ -31,7 +29,7 @@ public class EmprestimoEntity {
     @Column(nullable = false)
     private LocalDate dataEmprestimo;
 
-    private LocalDate dataDevolucao; // Fica nulo até ser devolvido
+    private LocalDate dataDevolucao; // fica nulo ateser devolvido
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
