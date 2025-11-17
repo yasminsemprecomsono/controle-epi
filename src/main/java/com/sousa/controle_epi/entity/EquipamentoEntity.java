@@ -19,6 +19,6 @@ public class EquipamentoEntity {
     @Column(nullable = false)
     private String nomeEquipamento;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "numero_ca", nullable = false, unique = true) // <--- O SEGREDO TÁ AQUI
     private String numeroCA;
 }
