@@ -1,5 +1,4 @@
 package com.sousa.controle_epi;
-
 import com.sousa.controle_epi.dto.*;
 import com.sousa.controle_epi.service.*;
 import org.springframework.boot.CommandLineRunner;
@@ -24,21 +23,37 @@ public class ControleEpiApplication {
 
 			try {
 				// prepara os dados
-				System.out.println("Criando dados para o teste...");
+				System.out.println("Criando dados para o teste");
 
+				// colaborador - pedreiro
 				RequisitarColaboradorDTO reqColab = new RequisitarColaboradorDTO();
-				reqColab.setNome("Yasmin Sousa");
-				reqColab.setMatricula("TESTE-2025");
+				reqColab.setNome("João Victor Pedreiro");
+				reqColab.setMatricula("PED-001");
+				reqColab.setCargo("Pedreiro");
 				InfosColaboradorDTO colab = colabService.criarColaborador(reqColab);
 
-				// EPI bom vai vencer em 2030
+				// colaborador - eletricista
+				RequisitarColaboradorDTO reqEletricista = new RequisitarColaboradorDTO();
+				reqEletricista.setNome("Yasmin Eletricista");
+				reqEletricista.setMatricula("ELE-001");
+				reqEletricista.setCargo("Eletricista");
+				InfosColaboradorDTO eletricista = colabService.criarColaborador(reqEletricista);
+
+				// epi normal
 				RequisitarEquipamentoDTO reqEpiBom = new RequisitarEquipamentoDTO();
 				reqEpiBom.setNomeEquipamento("Capacete Novo");
 				reqEpiBom.setNumeroCA("CA-BOM-001");
 				reqEpiBom.setDataValidade(LocalDate.now().plusYears(5));
 				InfosEquipamentoDTO epiBom = equipService.criarEquipamento(reqEpiBom);
 
-				// EPI vencido (venceu ontem)
+				// epi perigoso so pra eletricista
+				RequisitarEquipamentoDTO reqEpiPerigo = new RequisitarEquipamentoDTO();
+				reqEpiPerigo.setNomeEquipamento("Luva Alta Tensão");
+				reqEpiPerigo.setNumeroCA("CA-PERIGO-001");
+				reqEpiPerigo.setDataValidade(LocalDate.now().plusYears(5));
+				InfosEquipamentoDTO epiPerigo = equipService.criarEquipamento(reqEpiPerigo);
+
+				// epi vencido
 				RequisitarEquipamentoDTO reqEpiVencido = new RequisitarEquipamentoDTO();
 				reqEpiVencido.setNomeEquipamento("Luva Velha");
 				reqEpiVencido.setNumeroCA("CA-VELHO-002");
@@ -49,7 +64,7 @@ public class ControleEpiApplication {
 
 
 				// teste 1: tenta pega item vencido
-				System.out.print("Teste 1: Pegar item vencido \n");
+				System.out.print("Teste 1: Pegar item vencido... ");
 				try {
 					RequisitarEmprestimoDTO pedidoRuim = new RequisitarEmprestimoDTO();
 					pedidoRuim.setIdColaborador(colab.getId());
@@ -63,7 +78,7 @@ public class ControleEpiApplication {
 
 
 				// teste 2: pegar item bom
-				System.out.print("Teste 2: Pegar item bom (normal)\n ");
+				System.out.print("Teste 2: Pegar item bom (normal)... ");
 				RequisitarEmprestimoDTO pedidoBom = new RequisitarEmprestimoDTO();
 				pedidoBom.setIdColaborador(colab.getId());
 				pedidoBom.setIdEquipamento(epiBom.getId());
@@ -73,7 +88,7 @@ public class ControleEpiApplication {
 
 
 				// teste 3: pegar o mesmo item denovo
-				System.out.print("Teste 3: Bloquear item duplicado");
+				System.out.print("Teste 3: Bloquear item duplicado... ");
 				try {
 					empService.criarEmprestimo(pedidoBom);
 					System.out.println("Sitema duplicou (ruim)");
@@ -82,20 +97,49 @@ public class ControleEpiApplication {
 				}
 
 
-				// teste 4: testa devolver
-				System.out.print("Teste 4: Testando devolucao");
-				empService.devolverEquipamento(emprestimoRealizado.getIdEmprestimo());
+				// teste 4: testa devolver (SEM QUEBRAR)
+				System.out.print("Teste 4: Testando devolucao normal... ");
+				// Agora passamos 'false' indicando que NÃO está quebrado
+				empService.devolverEquipamento(emprestimoRealizado.getIdEmprestimo(), false);
 				System.out.println("Item devolvido.");
 
 
 				// teste 5: tenta devolver duas vezes o msm item
-				System.out.print("Teste 5: Devolução duplicada ");
+				System.out.print("Teste 5: Devolução duplicada... ");
 				try {
-					empService.devolverEquipamento(emprestimoRealizado.getIdEmprestimo());
+					empService.devolverEquipamento(emprestimoRealizado.getIdEmprestimo(), false);
 					System.out.println("Devolveu duas vezes(ruim)");
 				} catch (Exception e) {
 					System.out.println("Sistema avisou que ja foi devolvido (bom)");
 				}
+
+				// teste novo aq
+
+				// teste 6: bloqueio de cargo (pedreiro tentando pegar luva alta tensão)
+				System.out.print("Teste 6: Bloqueio por Cargo errado");
+				try {
+					RequisitarEmprestimoDTO pedidoProibido = new RequisitarEmprestimoDTO();
+					pedidoProibido.setIdColaborador(colab.getId()); // Pedreiro
+					pedidoProibido.setIdEquipamento(epiPerigo.getId()); // Luva Alta Tensão
+
+					empService.criarEmprestimo(pedidoProibido);
+					System.out.println("Sistema deixou Pedreiro pegar Alta Tensão (ruim)");
+				} catch (Exception e) {
+					System.out.println("Sistema Bloqueou cargo incorreto (bom): " + e.getMessage());
+				}
+
+				// teste 7: devolução com epi quebrado
+				System.out.print("Teste 7: Devolver item quebrado");
+				// emprestando de novo para poder devolver
+				RequisitarEmprestimoDTO pedidoEletrica = new RequisitarEmprestimoDTO();
+				pedidoEletrica.setIdColaborador(eletricista.getId());
+				pedidoEletrica.setIdEquipamento(epiPerigo.getId());
+				InfosEmprestimoDTO empEletrica = empService.criarEmprestimo(pedidoEletrica);
+
+				// deolver marcado como true (quebrado)
+				empService.devolverEquipamento(empEletrica.getIdEmprestimo(), true);
+				System.out.println("Item devolvido e enviado para manutenção(bom)");
+
 
 			} catch (Exception e) {
 				System.out.println("ERRO NO TESTE: " + e.getMessage());
