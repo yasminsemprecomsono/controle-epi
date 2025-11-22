@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDate;
+import com.sousa.controle_epi.entity.StatusEquipamento;
 
 @Entity
 @Table(name = "equipamentos")
@@ -24,5 +25,5 @@ public class EquipamentoEntity {
     private LocalDate dataValidade;
 
     @Enumerated(EnumType.STRING)
-    private StatusEmprestimo status = StatusEmprestimo.ATIVO;
+    private StatusEquipamento status = StatusEquipamento.DISPONIVEL;
 }

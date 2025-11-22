@@ -26,15 +26,18 @@ public class EmprestimoService {
         if (equipamento.getDataValidade() != null && equipamento.getDataValidade().isBefore(LocalDate.now())) {
             throw new RuntimeException("BLOQUEADO: EPI Vencido!");
         }
-        if (equipamento.getStatus() == StatusEmprestimo.MANUTENCAO) {
-            throw new RuntimeException("BLOQUEADO: Este item está quebrado/em manutenção.");
+
+        if (equipamento.getStatus() == StatusEquipamento.MANUTENCAO) {
+            throw new RuntimeException("BLOQUEADO: Item em manutenção.");
         }
-        if (equipamento.getStatus() == StatusEmprestimo.DEVOLVIDO) {
-            throw new RuntimeException("BLOQUEADO: Este item já está com outra pessoa.");
+
+        if (equipamento.getStatus() == StatusEquipamento.EMPRESTADO) {
+            throw new RuntimeException("BLOQUEADO: Item já está com outra pessoa.");
         }
+
         if (equipamento.getNomeEquipamento().toLowerCase().contains("alta tensão")) {
             if (!colaborador.getCargo().equalsIgnoreCase("Eletricista")) {
-                throw new RuntimeException("BLOQUEADO: Apenas Eletricistas podem retirar este EPI.");
+                throw new RuntimeException("BLOQUEADO: Apenas Eletricistas podem retirar.");
             }
         }
 
@@ -43,11 +46,13 @@ public class EmprestimoService {
         novo.setEquipamento(equipamento);
         novo.setDataEmprestimo(LocalDate.now());
         novo.setStatus(StatusEmprestimo.ATIVO);
-        equipamento.setStatus(StatusEmprestimo.DEVOLVIDO);
+
+        equipamento.setStatus(StatusEquipamento.EMPRESTADO);
         equipamentoRepository.save(equipamento);
 
         return new InfosEmprestimoDTO(emprestimoRepository.save(novo));
     }
+
     public InfosEmprestimoDTO devolverEquipamento(Long idEmprestimo, boolean estaQuebrado) {
         EmprestimoEntity emprestimo = emprestimoRepository.findById(idEmprestimo).get();
         EquipamentoEntity equipamento = emprestimo.getEquipamento();
@@ -57,13 +62,12 @@ public class EmprestimoService {
         }
 
         if (estaQuebrado) {
-            equipamento.setStatus(StatusEmprestimo.MANUTENCAO); // vai pra manutenção
-            System.out.println("Item " + equipamento.getNomeEquipamento() + " enviado para manutenção");
+            equipamento.setStatus(StatusEquipamento.MANUTENCAO);
+            System.out.println("EPI quebrado, enviado para manutenção.");
         } else {
-            equipamento.setStatus(StatusEmprestimo.ATIVO); // volta pro estoque
+            equipamento.setStatus(StatusEquipamento.DISPONIVEL);
         }
         equipamentoRepository.save(equipamento);
-
         emprestimo.setStatus(StatusEmprestimo.DEVOLVIDO);
         emprestimo.setDataDevolucao(LocalDate.now());
 
