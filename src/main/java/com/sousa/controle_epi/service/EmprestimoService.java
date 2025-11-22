@@ -40,20 +40,22 @@ public class EmprestimoService {
         return new InfosEmprestimoDTO(emprestimo);
     }
 //criar emprestimo validado
-    public InfosEmprestimoDTO criarEmprestimo(RequisitarEmprestimoDTO dto) {
+public InfosEmprestimoDTO criarEmprestimo(RequisitarEmprestimoDTO dto) {
+    ColaboradorEntity colaborador = colaboradorRepository.findById(dto.getIdColaborador()).get();
+    EquipamentoEntity equipamento = equipamentoRepository.findById(dto.getIdEquipamento()).get();
 
-        ColaboradorEntity colaborador = colaboradorRepository.findById(dto.getIdColaborador())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Colaborador não encontrado"));
+    // Verifica se tem validade e se a data de validade
+    if (equipamento.getDataValidade() != null &&
+            equipamento.getDataValidade().isBefore(LocalDate.now())) {
+        throw new RuntimeException("Este EPI está vencido! Empréstimo bloqueado");
+    }
 
-        EquipamentoEntity equipamento = equipamentoRepository.findById(dto.getIdEquipamento())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Equipamento não encontrado"));
+    boolean equipamentoJaEmprestado = emprestimoRepository
+            .existsByEquipamentoIdAndStatus(equipamento.getId(), StatusEmprestimo.ATIVO);
 
-        boolean equipamentoJaEmprestado = emprestimoRepository
-                .existsByEquipamentoIdAndStatus(equipamento.getId(), StatusEmprestimo.ATIVO);
-
-        if (equipamentoJaEmprestado) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Este equipamento já está em uso por outro colaborador.");
-        }
+    if (equipamentoJaEmprestado) {
+        throw new RuntimeException("Este equipamento já está em uso por outro colaborador.");
+    }
         //definir data e hr do emprestimo
         EmprestimoEntity novoEmprestimo = new EmprestimoEntity();
         novoEmprestimo.setColaborador(colaborador);
