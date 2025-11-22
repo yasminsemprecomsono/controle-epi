@@ -21,6 +21,9 @@ public class ColaboradorService {
         ColaboradorEntity colaborador = new ColaboradorEntity();
         colaborador.setNome(dto.getNome());
         colaborador.setMatricula(dto.getMatricula());
+
+        colaborador.setCargo(dto.getCargo());
+
         ColaboradorEntity colaboradorSalvo = colaboradorRepository.save(colaborador);
         return new InfosColaboradorDTO(colaboradorSalvo);
     }
@@ -44,6 +47,7 @@ public class ColaboradorService {
         ColaboradorEntity colaborador = colaboradorRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Colaborador não encontrado"));
         colaborador.setNome(dto.getNome());
+        colaborador.setCargo(dto.getCargo());
         colaborador.setMatricula(dto.getMatricula());
         ColaboradorEntity colaboradorAtualizado = colaboradorRepository.save(colaborador);
         return new InfosColaboradorDTO(colaboradorAtualizado);

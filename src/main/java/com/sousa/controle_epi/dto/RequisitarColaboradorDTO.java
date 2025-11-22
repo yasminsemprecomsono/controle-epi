@@ -8,4 +8,5 @@ import lombok.NoArgsConstructor;
 public class RequisitarColaboradorDTO {
     private String nome;
     private String matricula;
+    private String cargo;
 }

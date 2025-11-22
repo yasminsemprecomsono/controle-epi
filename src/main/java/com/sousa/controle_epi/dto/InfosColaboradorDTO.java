@@ -10,11 +10,13 @@ public class InfosColaboradorDTO {
     private Long id;
     private String nome;
     private String matricula;
+    private String cargo;
 
     // converte entity para dto
     public InfosColaboradorDTO(ColaboradorEntity entity) {
         this.id = entity.getId();
         this.nome = entity.getNome();
         this.matricula = entity.getMatricula();
+        this.cargo = entity.getCargo();
     }
 }

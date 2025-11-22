@@ -1,84 +1,76 @@
 package com.sousa.controle_epi.service;
 import com.sousa.controle_epi.dto.InfosEmprestimoDTO;
 import com.sousa.controle_epi.dto.RequisitarEmprestimoDTO;
-import com.sousa.controle_epi.entity.ColaboradorEntity;
-import com.sousa.controle_epi.entity.EmprestimoEntity;
-import com.sousa.controle_epi.entity.EquipamentoEntity;
-import com.sousa.controle_epi.entity.StatusEmprestimo;
-import com.sousa.controle_epi.repository.ColaboradorRepository;
-import com.sousa.controle_epi.repository.EmprestimoRepository;
-import com.sousa.controle_epi.repository.EquipamentoRepository;
+import com.sousa.controle_epi.entity.*;
+import com.sousa.controle_epi.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class EmprestimoService {
-    @Autowired
-    private EmprestimoRepository emprestimoRepository;
-    @Autowired
-    private ColaboradorRepository colaboradorRepository;
-    @Autowired
-    private EquipamentoRepository equipamentoRepository;
+    @Autowired private EmprestimoRepository emprestimoRepository;
+    @Autowired private ColaboradorRepository colaboradorRepository;
+    @Autowired private EquipamentoRepository equipamentoRepository;
 
-    //ver todos os emprestimos
     public List<InfosEmprestimoDTO> listarEmprestimos() {
-        return emprestimoRepository.findAll()
-                .stream()
-                .map(InfosEmprestimoDTO::new)
-                .collect(Collectors.toList());
-    }
-    //read id
-    //procura um emprestimo especifico pelo id e se nao achar vai dar erro
-    public InfosEmprestimoDTO buscarEmprestimoPorId(Long id) {
-        EmprestimoEntity emprestimo = emprestimoRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Empréstimo não encontrado"));
-        return new InfosEmprestimoDTO(emprestimo);
-    }
-//criar emprestimo validado
-public InfosEmprestimoDTO criarEmprestimo(RequisitarEmprestimoDTO dto) {
-    ColaboradorEntity colaborador = colaboradorRepository.findById(dto.getIdColaborador()).get();
-    EquipamentoEntity equipamento = equipamentoRepository.findById(dto.getIdEquipamento()).get();
-
-    // Verifica se tem validade e se a data de validade
-    if (equipamento.getDataValidade() != null &&
-            equipamento.getDataValidade().isBefore(LocalDate.now())) {
-        throw new RuntimeException("Este EPI está vencido! Empréstimo bloqueado");
+        return emprestimoRepository.findAll().stream().map(InfosEmprestimoDTO::new).collect(Collectors.toList());
     }
 
-    boolean equipamentoJaEmprestado = emprestimoRepository
-            .existsByEquipamentoIdAndStatus(equipamento.getId(), StatusEmprestimo.ATIVO);
+    public InfosEmprestimoDTO criarEmprestimo(RequisitarEmprestimoDTO dto) {
+        ColaboradorEntity colaborador = colaboradorRepository.findById(dto.getIdColaborador()).get();
+        EquipamentoEntity equipamento = equipamentoRepository.findById(dto.getIdEquipamento()).get();
 
-    if (equipamentoJaEmprestado) {
-        throw new RuntimeException("Este equipamento já está em uso por outro colaborador.");
-    }
-        //definir data e hr do emprestimo
-        EmprestimoEntity novoEmprestimo = new EmprestimoEntity();
-        novoEmprestimo.setColaborador(colaborador);
-        novoEmprestimo.setEquipamento(equipamento);
-        novoEmprestimo.setDataEmprestimo(LocalDate.now());
-        novoEmprestimo.setStatus(StatusEmprestimo.ATIVO);
-        //salva no banco o dto
-        EmprestimoEntity emprestimoSalvo = emprestimoRepository.save(novoEmprestimo);
-        return new InfosEmprestimoDTO(emprestimoSalvo);
-    }
-    // devolver
-    public InfosEmprestimoDTO devolverEquipamento(Long idEmprestimo) {
-        EmprestimoEntity emprestimo = emprestimoRepository.findById(idEmprestimo)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Empréstimo não encontrado"));
-        // se ja nao foi devolvido
-        if (emprestimo.getStatus() == StatusEmprestimo.DEVOLVIDO) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Este equipamento já foi devolvido.");
+        if (equipamento.getDataValidade() != null && equipamento.getDataValidade().isBefore(LocalDate.now())) {
+            throw new RuntimeException("BLOQUEADO: EPI Vencido!");
         }
-        // atualizar o status e data
+        if (equipamento.getStatus() == StatusEmprestimo.MANUTENCAO) {
+            throw new RuntimeException("BLOQUEADO: Este item está quebrado/em manutenção.");
+        }
+        if (equipamento.getStatus() == StatusEmprestimo.DEVOLVIDO) {
+            throw new RuntimeException("BLOQUEADO: Este item já está com outra pessoa.");
+        }
+        if (equipamento.getNomeEquipamento().toLowerCase().contains("alta tensão")) {
+            if (!colaborador.getCargo().equalsIgnoreCase("Eletricista")) {
+                throw new RuntimeException("BLOQUEADO: Apenas Eletricistas podem retirar este EPI.");
+            }
+        }
+
+        EmprestimoEntity novo = new EmprestimoEntity();
+        novo.setColaborador(colaborador);
+        novo.setEquipamento(equipamento);
+        novo.setDataEmprestimo(LocalDate.now());
+        novo.setStatus(StatusEmprestimo.ATIVO);
+        equipamento.setStatus(StatusEmprestimo.DEVOLVIDO);
+        equipamentoRepository.save(equipamento);
+
+        return new InfosEmprestimoDTO(emprestimoRepository.save(novo));
+    }
+    public InfosEmprestimoDTO devolverEquipamento(Long idEmprestimo, boolean estaQuebrado) {
+        EmprestimoEntity emprestimo = emprestimoRepository.findById(idEmprestimo).get();
+        EquipamentoEntity equipamento = emprestimo.getEquipamento();
+
+        if (emprestimo.getStatus() == StatusEmprestimo.DEVOLVIDO) {
+            throw new RuntimeException("Já devolvido!");
+        }
+
+        if (estaQuebrado) {
+            equipamento.setStatus(StatusEmprestimo.MANUTENCAO); // vai pra manutenção
+            System.out.println("Item " + equipamento.getNomeEquipamento() + " enviado para manutenção");
+        } else {
+            equipamento.setStatus(StatusEmprestimo.ATIVO); // volta pro estoque
+        }
+        equipamentoRepository.save(equipamento);
+
         emprestimo.setStatus(StatusEmprestimo.DEVOLVIDO);
         emprestimo.setDataDevolucao(LocalDate.now());
-        //salva no banco
-        EmprestimoEntity emprestimoSalvo = emprestimoRepository.save(emprestimo);
-        return new InfosEmprestimoDTO(emprestimoSalvo);
+
+        return new InfosEmprestimoDTO(emprestimoRepository.save(emprestimo));
+    }
+
+    public InfosEmprestimoDTO buscarEmprestimoPorId(Long id) {
+        return new InfosEmprestimoDTO(emprestimoRepository.findById(id).get());
     }
 }

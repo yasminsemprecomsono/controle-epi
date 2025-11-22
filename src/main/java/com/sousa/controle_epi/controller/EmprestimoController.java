@@ -11,31 +11,26 @@ import java.util.List;
 @RestController
 @RequestMapping("/emprestimos")
 public class EmprestimoController {
-    @Autowired
-    private EmprestimoService emprestimoService;
-
-    @GetMapping
-    public ResponseEntity<List<InfosEmprestimoDTO>> listarEmprestimos() {
-        List<InfosEmprestimoDTO> lista = emprestimoService.listarEmprestimos();
-        return ResponseEntity.ok(lista);
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<InfosEmprestimoDTO> buscarEmprestimoPorId(@PathVariable Long id) {
-        InfosEmprestimoDTO emprestimo = emprestimoService.buscarEmprestimoPorId(id);
-        return ResponseEntity.ok(emprestimo);
-    }
+    @Autowired private EmprestimoService service;
 
     @PostMapping
-    public ResponseEntity<InfosEmprestimoDTO> criarEmprestimo(@RequestBody RequisitarEmprestimoDTO dto) {
-        InfosEmprestimoDTO novoEmprestimo = emprestimoService.criarEmprestimo(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(novoEmprestimo);
+    public ResponseEntity<InfosEmprestimoDTO> criar(@RequestBody RequisitarEmprestimoDTO dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.criarEmprestimo(dto));
     }
-
-    // ação de devolver
+    @GetMapping
+    public ResponseEntity<List<InfosEmprestimoDTO>> listar() {
+        return ResponseEntity.ok(service.listarEmprestimos());
+    }
+    // novo
     @PutMapping("/{id}/devolver")
-    public ResponseEntity<InfosEmprestimoDTO> devolverEquipamento(@PathVariable Long id) {
-        InfosEmprestimoDTO emprestimoAtualizado = emprestimoService.devolverEquipamento(id);
-        return ResponseEntity.ok(emprestimoAtualizado);
+    public ResponseEntity<InfosEmprestimoDTO> devolver(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "false") boolean quebrado) {
+
+        return ResponseEntity.ok(service.devolverEquipamento(id, quebrado));
+    }
+    @GetMapping("/{id}")
+    public ResponseEntity<InfosEmprestimoDTO> buscarPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(service.buscarEmprestimoPorId(id));
     }
 }
