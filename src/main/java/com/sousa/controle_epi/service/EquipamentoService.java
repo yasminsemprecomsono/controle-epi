@@ -22,6 +22,8 @@ public class EquipamentoService {
         equipamento.setNomeEquipamento(dto.getNomeEquipamento());
         equipamento.setNumeroCA(dto.getNumeroCA());
 
+        equipamento.setDataValidade(dto.getDataValidade());
+
         EquipamentoEntity equipamentoSalvo = equipamentoRepository.save(equipamento);
         return new InfosEquipamentoDTO(equipamentoSalvo);
     }
