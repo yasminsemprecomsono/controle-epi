@@ -99,7 +99,7 @@ public class ControleEpiApplication {
 
 				// teste 4: testa devolver (SEM QUEBRAR)
 				System.out.print("Teste 4: Testando devolucao normal... ");
-				// Agora passamos 'false' indicando que NÃO está quebrado
+				// Agora passamos 'false' indicando que não está quebrado
 				empService.devolverEquipamento(emprestimoRealizado.getIdEmprestimo(), false);
 				System.out.println("Item devolvido.");
 
