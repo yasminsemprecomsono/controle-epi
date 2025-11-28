@@ -7,7 +7,7 @@ CREATE TABLE colaboradores (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(255) NOT NULL,
     matricula VARCHAR(255) NOT NULL UNIQUE,
-    cargo VARCHAR(255) NOT NULL --coluna nova
+    cargo VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE equipamentos (
@@ -15,7 +15,7 @@ CREATE TABLE equipamentos (
     nome_equipamento VARCHAR(255) NOT NULL,
     numero_ca VARCHAR(255) NOT NULL UNIQUE,
     data_validade DATE,
-    status VARCHAR(50) --coluna nova
+    status VARCHAR(50)
 );
 
 CREATE TABLE emprestimos (
