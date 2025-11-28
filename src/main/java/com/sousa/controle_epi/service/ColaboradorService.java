@@ -4,9 +4,9 @@ import com.sousa.controle_epi.dto.RequisitarColaboradorDTO;
 import com.sousa.controle_epi.entity.ColaboradorEntity;
 import com.sousa.controle_epi.repository.ColaboradorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,14 +38,14 @@ public class ColaboradorService {
     // procura o colaborador pelo id
     public InfosColaboradorDTO buscarColaboradorPorId(Long id) {
         ColaboradorEntity colaborador = colaboradorRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Colaborador não encontrado"));
+                .orElseThrow(() -> new RuntimeException("Colaborador não encontrado"));
         return new InfosColaboradorDTO(colaborador);
     }
     // update
     //atualiza matricula
     public InfosColaboradorDTO atualizarColaborador(Long id, RequisitarColaboradorDTO dto) {
         ColaboradorEntity colaborador = colaboradorRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Colaborador não encontrado"));
+                .orElseThrow(() -> new RuntimeException("Colaborador não encontrado"));
         colaborador.setNome(dto.getNome());
         colaborador.setCargo(dto.getCargo());
         colaborador.setMatricula(dto.getMatricula());
@@ -56,7 +56,7 @@ public class ColaboradorService {
     //deleta o colaborador pelo id no banco
     public void deletarColaborador(Long id) {
         if (!colaboradorRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Colaborador não encontrado");
+            throw new RuntimeException ("Colaborador não encontrado");
         }
         colaboradorRepository.deleteById(id);
     }

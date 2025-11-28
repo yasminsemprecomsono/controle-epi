@@ -4,9 +4,9 @@ import com.sousa.controle_epi.dto.RequisitarEquipamentoDTO;
 import com.sousa.controle_epi.entity.EquipamentoEntity;
 import com.sousa.controle_epi.repository.EquipamentoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,14 +37,14 @@ public class EquipamentoService {
 //pega equipamento pelo id
     public InfosEquipamentoDTO buscarEquipamentoPorId(Long id) {
         EquipamentoEntity equipamento = equipamentoRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Equipamento não encontrado"));
+                .orElseThrow(() -> new RuntimeException("Equipamento não encontrado"));
         return new InfosEquipamentoDTO(equipamento);
     }
     // up
     //atualiza os dados que ja existem
     public InfosEquipamentoDTO atualizarEquipamento(Long id, RequisitarEquipamentoDTO dto) {
         EquipamentoEntity equipamento = equipamentoRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Equipamento não encontrado"));
+                .orElseThrow(() -> new RuntimeException("Equipamento não encontrado"));
 
         equipamento.setNomeEquipamento(dto.getNomeEquipamento());
         equipamento.setNumeroCA(dto.getNumeroCA());
@@ -54,7 +54,7 @@ public class EquipamentoService {
 //deleta equipamento
     public void deletarEquipamento(Long id) {
         if (!equipamentoRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Equipamento não encontrado");
+            throw new RuntimeException ("Equipamento não encontrado");
         }
         equipamentoRepository.deleteById(id);
     }
